@@ -1,0 +1,138 @@
+{% extends "base.html" %}
+
+{% block title %}Cryptexa | User Transactions Auditor{% endblock %}
+
+{% block content %}
+<div class="max-w-6xl mx-auto px-6 py-6 space-y-8">
+    
+    <!-- Title banner with logout option -->
+    <div class="flex flex-wrap items-center justify-between gap-4 border-b border-white/5 pb-4">
+        <div class="space-y-1">
+            <span class="font-mono text-[9px] px-2.5 py-1 rounded bg-rose-500/10 text-rose-400 font-bold uppercase tracking-widest border border-rose-500/20 inline-block">
+                ROOT SECURITY DOMAIN - LEVEL 1
+            </span>
+            <h2 class="font-display text-2xl md:text-3xl font-black text-white tracking-tight">Superadmin Control Center</h2>
+            <p class="text-xs text-slate-400 font-sans">Mengelola database koin digital, mengaudit statistik sistem, dan memantau transaksi pengguna.</p>
+        </div>
+        
+        <a href="{% url 'admin_logout' %}" class="px-4 py-2 bg-rose-500/10 hover:bg-rose-500 text-rose-400 hover:text-white border border-rose-500/20 font-mono text-[10px] font-bold rounded-xl transition-all">
+            TERMINATE SESSION (LOGOUT)
+        </a>
+    </div>
+
+    <!-- Navigation Tabs -->
+    <div class="flex border-b border-white/5 font-mono text-[10px] gap-2 select-none">
+        <a href="{% url 'admin_dashboard' %}" class="px-5 py-2.5 hover:bg-slate-950/40 text-slate-400 hover:text-white transition-all font-bold flex items-center gap-1.5">
+            Overview &amp; Coin Registry
+        </a>
+        <a href="{% url 'admin_transactions' %}" class="px-5 py-2.5 bg-slate-900 text-cyan-400 border-t border-x border-white/10 rounded-t-xl font-bold flex items-center gap-1.5">
+            User Transactions Ledger
+        </a>
+    </div>
+
+    <!-- Filter & Search Panel -->
+    <form method="GET" action="{% url 'admin_transactions' %}" class="p-5 bg-slate-950/40 border border-white/5 rounded-2xl backdrop-blur-xl grid grid-cols-1 md:grid-cols-4 gap-4 items-end font-mono text-[10px] text-slate-400">
+        <!-- Search query -->
+        <div class="space-y-1.5">
+            <label for="search" class="font-bold uppercase tracking-wide">Search Transaction</label>
+            <div class="relative">
+                <input id="search" type="text" name="search" value="{{ search_query }}" placeholder="Username atau symbol..." class="w-full bg-slate-950 border border-white/10 rounded-xl px-3.5 py-2 text-xs text-white focus:outline-none focus:border-cyan-400 font-sans">
+            </div>
+        </div>
+
+        <!-- Coin Filter dropdown -->
+        <div class="space-y-1.5">
+            <label for="coin" class="font-bold uppercase tracking-wide">Filter by Coin</label>
+            <select id="coin" name="coin" class="w-full bg-slate-950 border border-white/10 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-cyan-400 font-sans">
+                <option value="">-- Semua Koin --</option>
+                {% for symbol in all_coins %}
+                    <option value="{{ symbol }}" {% if selected_coin == symbol %}selected{% endif %}>{{ symbol }}</option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <!-- User Filter dropdown -->
+        <div class="space-y-1.5">
+            <label for="user" class="font-bold uppercase tracking-wide">Filter by User Account</label>
+            <select id="user" name="user" class="w-full bg-slate-950 border border-white/10 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-cyan-400 font-sans">
+                <option value="">-- Semua Pengguna --</option>
+                {% for username in all_users %}
+                    <option value="{{ username }}" {% if selected_user == username %}selected{% endif %}>{{ username }}</option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <!-- Submit & Clear utility buttons -->
+        <div class="grid grid-cols-2 gap-2 text-center h-9">
+            <button type="submit" class="bg-cyan-400 hover:bg-cyan-300 text-black text-xs font-extrabold rounded-xl py-2 cursor-pointer transition-colors uppercase">
+                Filter
+            </button>
+            <a href="{% url 'admin_transactions' %}" class="bg-white/5 hover:bg-white/15 text-white border border-white/10 text-xs font-bold rounded-xl py-2 flex items-center justify-center transition-all uppercase">
+                Reset
+            </a>
+        </div>
+    </form>
+
+    <!-- Transactions Audit Ledger Table -->
+    <div class="p-1 bg-slate-950/30 border border-white/5 rounded-2xl overflow-hidden backdrop-blur-xl">
+        <div class="overflow-x-auto">
+            <table class="w-full text-left border-collapse text-xs">
+                <thead>
+                    <tr class="border-b border-white/5 font-mono text-[9px] text-slate-500 font-bold uppercase select-none">
+                        <th class="p-4">Tanggal</th>
+                        <th class="p-4">Nama Pengguna</th>
+                        <th class="p-4">Koin</th>
+                        <th class="p-4 text-right">Tipe / Saldo</th>
+                        <th class="p-4 text-right">Harga Beli Tool</th>
+                        <th class="p-4 text-right">Valuasi Live</th>
+                        <th class="p-4 text-right">Profit / Loss</th>
+                        <th class="p-4 text-center">Tindakan</th>
+                    </tr>
+                </thead>
+                <tbody class="font-sans">
+                    {% for tx in transactions %}
+                        <tr class="border-b border-white/5 hover:bg-white/[0.01]">
+                            <td class="p-4 font-mono text-slate-500 text-[10px]">{{ tx.date }}</td>
+                            <td class="p-4 font-bold text-white">user</td>
+                            <td class="p-4">
+                                <div class="flex items-center gap-2">
+                                    <span class="font-mono text-slate-400 font-bold bg-slate-900 border border-white/5 px-2 py-0.5 rounded text-[10px]">{{ tx.coin_symbol }}</span>
+                                    <span class="text-xs text-slate-300">{{ tx.coin_name }}</span>
+                                </div>
+                            </td>
+                            <td class="p-4 text-right font-mono text-white">
+                                <span class="text-emerald-400 font-bold block text-[10px]">{{ tx.type }}</span>
+                                <span class="text-slate-500 text-[9px] block font-normal">{{ tx.amount }} {{ tx.coin_symbol }}</span>
+                            </td>
+                            <td class="p-4 text-right font-mono text-slate-400">${{ tx.buy_price|floatformat:2 }}</td>
+                            <td class="p-4 text-right font-mono text-white font-semibold">${{ tx.current_value|floatformat:2 }}</td>
+                            <td class="p-4 text-right font-mono text-[11px]">
+                                {% if tx.profit_loss >= 0 %}
+                                    <span class="text-emerald-400 font-bold">+${{ tx.profit_loss|floatformat:2 }}</span>
+                                {% else %}
+                                    <span class="text-rose-400 font-bold">-${{ tx.profit_loss|floatformat:2|slice:"1:" }}</span>
+                                {% endif %}
+                            </td>
+                            <td class="p-4 text-center">
+                                <form method="POST" action="{% url 'delete_transaction' tx.id %}" onsubmit="return confirm('Apakah Anda yakin ingin menghapus catatan transaksi ini dari SQLite database? Tindakan ini permanen.');">
+                                    {% csrf_token %}
+                                    <button type="submit" class="px-2.5 py-1.5 bg-rose-500/10 hover:bg-rose-500 text-rose-400 hover:text-white border border-rose-500/20 rounded-lg text-[9px] font-mono font-bold transition-all cursor-pointer">
+                                        DELETE TX
+                                    </button>
+                                </form>
+                            </td>
+                        </tr>
+                    {% empty %}
+                        <tr>
+                            <td colspan="8" class="p-8 text-center text-slate-500 font-mono text-[10px]">
+                                Tidak ada catatan data transaksi yang cocok dengan kriteria filter pencarian Anda.
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+</div>
+{% endblock %}

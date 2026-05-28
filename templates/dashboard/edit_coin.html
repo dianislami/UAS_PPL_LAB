@@ -1,0 +1,95 @@
+{% extends "base.html" %}
+
+{% block title %}Cryptexa | Edit Coin Registry #{{ coin.id }}{% endblock %}
+
+{% block content %}
+<div class="max-w-3xl mx-auto px-6 py-8 space-y-8">
+    
+    <!-- Title banner -->
+    <div class="flex items-center justify-between border-b border-white/5 pb-5">
+        <div class="space-y-1">
+            <span class="font-mono text-[9px] px-2.5 py-1 rounded bg-[#06b6d4]/10 text-cyan-400 font-bold uppercase tracking-widest border border-[#06b6d4]/20 inline-block">
+                DATABASE EDITOR
+            </span>
+            <h2 class="font-display text-2xl md:text-3xl font-black text-white tracking-tight">Edit Coin: {{ coin.name }}</h2>
+            <p class="text-xs text-slate-400 font-sans">Perbarui parameter koin digital {{ coin.symbol }}.</p>
+        </div>
+        
+        <a href="{% url 'admin_dashboard' %}" class="px-3.5 py-2 bg-slate-900 hover:bg-white/10 text-slate-300 hover:text-white border border-white/10 font-mono text-[9px] font-bold rounded-xl transition-all">
+            &larr; CANCEL (BACK)
+        </a>
+    </div>
+
+    <!-- Edit Form Box -->
+    <div class="p-6 bg-slate-950/40 border border-white/5 rounded-3xl backdrop-blur-xl relative overflow-hidden">
+        <div class="absolute -left-12 -top-12 w-28 h-28 rounded-full bg-cyan-400/5 blur-3xl pointer-events-none"></div>
+        
+        <form method="POST" action="{% url 'edit_coin' coin.id %}" class="space-y-6 font-mono text-[10px] text-slate-400">
+            {% csrf_token %}
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div class="space-y-1.5">
+                    <label for="name" class="font-bold text-slate-300">NAMA KOIN <span class="text-rose-500">*</span></label>
+                    <input id="name" type="text" name="name" value="{{ coin.name }}" required class="w-full bg-slate-900 border border-white/10 rounded-xl px-4 py-2.5 text-xs text-white focus:outline-none focus:border-cyan-400 font-sans">
+                </div>
+                <div class="space-y-1.5">
+                    <label for="symbol" class="font-bold text-slate-300">SIMBOL KOIN <span class="text-rose-500">*</span></label>
+                    <input id="symbol" type="text" name="symbol" value="{{ coin.symbol }}" required class="w-full bg-slate-900 border border-white/10 rounded-xl px-4 py-2.5 text-xs text-white focus:outline-none focus:border-cyan-400 font-sans">
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div class="space-y-1.5">
+                    <label for="price" class="font-bold text-slate-300">HARGA (USD) <span class="text-rose-500">*</span></label>
+                    <input id="price" type="number" step="any" name="price" value="{{ coin.price }}" required class="w-full bg-slate-900 border border-white/10 rounded-xl px-4 py-2.5 text-xs text-white focus:outline-none focus:border-cyan-400 font-sans">
+                </div>
+                <div class="space-y-1.5">
+                    <label for="change_24h" class="font-bold text-slate-300">PERUBAHAN 24 JAM (%) <span class="text-rose-500">*</span></label>
+                    <input id="change_24h" type="number" step="any" name="change_24h" value="{{ coin.change_24h }}" required class="w-full bg-slate-900 border border-white/10 rounded-xl px-4 py-2.5 text-xs text-white focus:outline-none focus:border-cyan-400 font-sans">
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div class="space-y-1.5">
+                    <label for="market_cap" class="font-bold text-slate-300">MARKET CAP</label>
+                    <input id="market_cap" type="text" name="market_cap" value="{{ coin.market_cap }}" placeholder="$100.0 Million" class="w-full bg-slate-900 border border-white/10 rounded-xl px-4 py-2.5 text-xs text-white focus:outline-none focus:border-cyan-400 font-sans">
+                </div>
+                <div class="space-y-1.5">
+                    <label for="volume_24h" class="font-bold text-slate-300">VOLUME 24 JAM</label>
+                    <input id="volume_24h" type="text" name="volume_24h" value="{{ coin.volume_24h }}" placeholder="$10.0 Million" class="w-full bg-slate-900 border border-white/10 rounded-xl px-4 py-2.5 text-xs text-white focus:outline-none focus:border-cyan-400 font-sans">
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div class="space-y-1.5">
+                    <label for="circulating_supply" class="font-bold text-slate-300">CIRCULATING SUPPLY</label>
+                    <input id="circulating_supply" type="text" name="circulating_supply" value="{{ coin.circulating_supply }}" placeholder="10.0M" class="w-full bg-slate-900 border border-white/10 rounded-xl px-4 py-2.5 text-xs text-white focus:outline-none focus:border-cyan-400 font-sans">
+                </div>
+                <div class="space-y-1.5">
+                    <label for="max_supply" class="font-bold text-slate-300">MAX SUPPLY</label>
+                    <input id="max_supply" type="text" name="max_supply" value="{{ coin.max_supply }}" placeholder="Unlimited" class="w-full bg-slate-900 border border-white/10 rounded-xl px-4 py-2.5 text-xs text-white focus:outline-none focus:border-cyan-400 font-sans">
+                </div>
+            </div>
+
+            <div class="space-y-1.5">
+                <label for="rank" class="font-bold text-slate-300">RANK SEKARANG</label>
+                <input id="rank" type="number" name="rank" value="{{ coin.rank }}" required class="w-full bg-slate-900 border border-white/10 rounded-xl px-4 py-2.5 text-xs text-white focus:outline-none focus:border-cyan-400 font-sans">
+            </div>
+
+            <div class="space-y-1.5">
+                <label for="description" class="font-bold text-slate-300">DESKRIPSI / PARAMETER TEKNIKAL</label>
+                <textarea id="description" name="description" rows="4" class="w-full bg-slate-900 border border-white/10 rounded-xl px-4 py-3 text-xs text-white focus:outline-none focus:border-cyan-400 font-sans leading-relaxed">{{ coin.description }}</textarea>
+            </div>
+
+            <div class="flex items-center gap-3 pt-4 border-t border-white/5">
+                <button type="submit" class="flex-1 py-3 bg-[#06b6d4] hover:bg-cyan-400 text-black text-xs font-black rounded-xl uppercase tracking-wider transition-all cursor-pointer">
+                    SAVE CHANGES
+                </button>
+                <a href="{% url 'admin_dashboard' %}" class="px-6 py-3 bg-white/5 hover:bg-white/10 text-white border border-white/10 text-xs font-bold rounded-xl text-center transition-all">
+                    Cancel
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,129 @@
+{% extends "base.html" %}
+
+{% block title %}Cryptexa | Cryptocurrency System{% endblock %}
+
+{% block content %}
+<div class="max-w-6xl mx-auto px-6 py-10 space-y-20">
+    
+    <!-- Hero cyber grid section -->
+    <section class="text-center space-y-8 py-12 relative overflow-hidden">
+        <!-- Ambient circular gradients -->
+        <div class="absolute inset-0 flex items-center justify-center pointer-events-none">
+            <div class="w-96 h-96 rounded-full bg-cyan-500/10 blur-[120px] animate-pulse"></div>
+            <div class="w-80 h-80 rounded-full bg-blue-600/5 blur-[100px]"></div>
+        </div>
+
+        <div class="relative z-10 space-y-6">
+            <p class="font-mono text-xs text-cyan-400 font-bold uppercase tracking-[0.25em] flex items-center justify-center gap-2">
+                <span class="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-ping"></span>
+                SECURE DECENTRALIZED MVT NODE
+            </p>
+            <h1 class="font-display text-4xl md:text-6xl font-black text-white tracking-tight leading-none">
+                Pantau Aset Kripto Global<br>
+                <span class="bg-gradient-to-r from-cyan-400 via-teal-300 to-blue-500 bg-clip-text text-transparent">Dengan Presisi Mutlak</span>
+            </h1>
+            <p class="text-slate-400 text-sm md:text-base max-w-xl mx-auto font-sans leading-relaxed">
+                Platform penjelajah pasar finansial digital modern. Lakukan pengawasan market, hitung keuntungan portofolio, dan miliki kendali penuh.
+            </p>
+        </div>
+
+        <div class="flex flex-wrap justify-center items-center gap-4 relative z-10 pt-4">
+            <a href="{% url 'explore_coins' %}" class="px-6 py-3 bg-cyan-400 hover:bg-cyan-300 text-black font-semibold text-xs rounded-xl tracking-wider uppercase font-mono transition-colors shadow-lg shadow-cyan-400/10 active:scale-95 duration-100">
+                Explore Market
+            </a>
+            <a href="{% url 'portfolio_dashboard' %}" class="px-6 py-3 bg-slate-900 hover:bg-slate-850 text-white border border-white/5 font-semibold text-xs rounded-xl tracking-wider uppercase font-mono transition-colors active:scale-95 duration-100">
+                My Holdings
+            </a>
+        </div>
+    </section>
+
+    <!-- Hot featured coins Row -->
+    <section class="space-y-6">
+        <div class="flex items-center justify-between border-b border-white/5 pb-4">
+            <div>
+                <h3 class="font-display text-lg font-bold text-white tracking-tight">Koin Unggulan Hari Ini</h3>
+                <p class="text-xs text-slate-500 font-mono">Real-time data</p>
+            </div>
+            <a href="{% url 'explore_coins' %}" class="text-xs font-mono font-bold text-cyan-400 hover:text-cyan-300 transition-colors flex items-center gap-1.5">
+                EXPAND LIST <svg class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" /></svg>
+            </a>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {% for coin in featured_coins %}
+                <div class="p-6 bg-slate-950/40 border border-white/5 rounded-2xl backdrop-blur-xl space-y-4 hover:border-cyan-400/30 transition-all duration-300 hover:translate-y-[-4px]">
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center gap-3">
+                            <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-cyan-500/10 to-blue-500/10 border border-cyan-500/20 flex items-center justify-center font-bold text-cyan-400 font-mono text-sm shadow-sm">
+                                {{ coin.symbol|slice:":1" }}
+                            </div>
+                            <div>
+                                <h4 class="font-display font-extrabold text-sm text-white leading-none">{{ coin.name }}</h4>
+                                <span class="font-mono text-[9px] text-slate-500 tracking-wider">{{ coin.symbol }} / USD</span>
+                            </div>
+                        </div>
+                        <span class="font-mono text-[9px] px-2 py-1 rounded-md border {% if coin.change_24h > 0 %}border-emerald-500/10 bg-emerald-500/5 text-emerald-400{% else %}border-red-500/10 bg-red-500/5 text-red-400{% endif %}">
+                            {{ coin.change_24h }}%
+                        </span>
+                    </div>
+
+                    <div class="space-y-1">
+                        <span class="font-mono text-[10px] text-slate-500 leading-none block">Live Price Valuation</span>
+                        <div class="flex items-baseline gap-1.5">
+                            <span class="font-mono text-lg font-black text-white">${{ coin.price|floatformat:2 }}</span>
+                            <span class="text-[10px] text-slate-400 font-mono">USD</span>
+                        </div>
+                    </div>
+
+                    <!-- Mini Sparkline view inside Django -->
+                    <div class="h-8 flex items-end gap-1 px-1">
+                        {% for val in coin.sparkline_list %}
+                            <div class="flex-grow rounded-sm bg-gradient-to-t {% if coin.change_24h > 0 %}from-emerald-500/20 to-emerald-400/80{% else %}from-red-500/20 to-red-400/80{% endif %}" style="height: {% if forloop.first %}40%{% elif forloop.counter == 2 %}55%{% elif forloop.counter == 3 %}75%{% elif forloop.counter == 4 %}60%{% else %}90%{% endif %}"></div>
+                        {% endfor %}
+                    </div>
+
+                    <div class="flex justify-between items-center pt-2 font-mono text-[10px] text-slate-500 border-t border-white/5">
+                        <span>Rank #{{ coin.rank }}</span>
+                        <span>Mkt Cap: {{ coin.market_cap }}</span>
+                    </div>
+
+                    <a href="{% url 'coin_detail' coin.id %}" class="block text-center py-2 bg-slate-900 border border-white/5 hover:border-cyan-400/20 rounded-xl text-slate-300 hover:text-cyan-400 transition-all font-mono text-[10px] font-bold">
+                        ANALYZE CHARTS
+                    </a>
+                </div>
+            {% empty %}
+                <div class="col-span-3 text-center py-12 p-6 bg-slate-950/40 border border-white/5 rounded-2xl">
+                    <p class="text-xs font-mono text-slate-500">Database belum dimigrasikan atau kosong. Silakan kunjungi menu mana saja untuk melakukan auto-seed! 😊</p>
+                </div>
+            {% endfor %}
+        </div>
+    </section>
+
+    <!-- System banner and technology specifications -->
+    <section class="p-8 bg-gradient-to-br from-slate-950/90 to-slate-950/40 border border-white/5 rounded-3xl relative overflow-hidden">
+        <div class="absolute top-0 right-0 p-8 opacity-5">
+            <svg class="h-44 w-44" fill="currentColor" viewBox="0 0 24 24"><path d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12"/></svg>
+        </div>
+
+        <div class="max-w-xl space-y-6 relative z-10">
+            <span class="font-mono text-[9px] px-2.5 py-1 rounded-md bg-cyan-400/10 text-cyan-400 font-bold border border-cyan-400/20 uppercase">
+                DECENTRALIZED ANALYTICS INFRASTRUCTURE
+            </span>
+            <h3 class="font-display text-2xl font-bold text-white tracking-tight">Secure Architecture</h3>
+            <p class="text-xs text-slate-400 leading-relaxed font-sans">
+                Aplikasi ini dikembangkan menggunakan struktur standar industri yang menekankan kesederhanaan pemahaman, efisiensi waktu pemrosesan server, keamanan data lokal, serta kemudahan modifikasi. Menghapus ketergantungan JavaScript pihak ketiga yang berat untuk memfokuskan pilar utama pada MVT (Model-View-Template) yang handal.
+            </p>
+            <div class="grid grid-cols-2 gap-4 font-mono text-[10px] text-slate-500 pt-2">
+                <div class="flex items-center gap-2">
+                    <span class="w-1.5 h-1.5 rounded-full bg-cyan-400"></span>
+                    DB Local Engine
+                </div>
+                <div class="flex items-center gap-2">
+                    <span class="w-1.5 h-1.5 rounded-full bg-cyan-400"></span>
+                    Django Core Auth Node
+                </div>
+            </div>
+        </div>
+    </section>
+</div>
+{% endblock %}

@@ -1,0 +1,134 @@
+{% extends "base.html" %}
+
+{% block title %}Cryptexa | Detail {{ coin.name }}{% endblock %}
+
+{% block content %}
+<div class="max-w-6xl mx-auto px-6 py-6 space-y-10">
+    
+    <!-- Navigation Back banner -->
+    <div class="flex items-center gap-3">
+        <a href="{% url 'explore_coins' %}" class="p-4 bg-slate-900 hover:bg-slate-850 text-slate-400 hover:text-white rounded-xl border border-white/5 transition-colors cursor-pointer">
+            <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" /></svg>
+        </a>
+        <div>
+            <span class="font-mono text-[9px] text-slate-500 tracking-wider">SECURE LEDGER NODE</span>
+            <div class="flex items-center gap-2">
+                <h2 class="font-display text-xl md:text-2xl font-black text-white leading-none">{{ coin.name }}</h2>
+                <span class="font-mono text-[10px] text-cyan-400 font-bold bg-cyan-400/10 px-2 py-0.5 rounded border border-cyan-400/20">{{ coin.symbol }}</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bento Grid details -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        
+        <!-- Left 2 columns: Coin detail tokenomics & Order execution -->
+        <div class="lg:col-span-2 space-y-8">
+            
+            <!-- Statistics glass card -->
+            <div class="p-6 bg-slate-950/40 border border-white/5 rounded-3xl space-y-6 backdrop-blur-xl">
+                <div class="flex flex-wrap justify-between items-center gap-4 border-b border-white/5 pb-4">
+                    <div class="space-y-1">
+                        <span class="font-mono text-[10px] text-slate-500 uppercase tracking-widest font-bold">LIVE TRANSACTING VALUATION</span>
+                        <div class="flex items-baseline gap-2">
+                            <h3 class="font-mono text-3xl font-black text-white">${{ coin.price|floatformat:2 }}</h3>
+                            <span class="font-mono text-sm text-slate-400">USD</span>
+                        </div>
+                    </div>
+                    
+                    <div class="text-right">
+                        <span class="font-mono text-[10px] text-slate-500 block">24H PERFORMANCE</span>
+                        <span class="font-mono px-3 py-1.5 rounded-xl border inline-block text-xs font-bold {% if coin.change_24h > 0 %}border-emerald-500/10 bg-emerald-500/5 text-emerald-400{% else %}border-red-500/10 bg-red-500/5 text-red-400{% endif %}">
+                            {{ coin.change_24h }}%
+                        </span>
+                    </div>
+                </div>
+
+                <!-- Tokenomics Parameters -->
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-6 font-mono text-xs">
+                    <div class="space-y-1">
+                        <span class="text-slate-500 text-[10px] block uppercase">MARKET RANK</span>
+                        <span class="font-bold text-white text-sm">#{{ coin.rank }}</span>
+                    </div>
+                    <div class="space-y-1">
+                        <span class="text-slate-500 text-[10px] block uppercase">MARKET CAP</span>
+                        <span class="font-bold text-white text-sm">{{ coin.market_cap }}</span>
+                    </div>
+                    <div class="space-y-1">
+                        <span class="text-slate-500 text-[10px] block uppercase">24H VOLUME</span>
+                        <span class="font-bold text-white text-sm">{{ coin.volume_24h }}</span>
+                    </div>
+                    <div class="space-y-1">
+                        <span class="text-slate-500 text-[10px] block uppercase">CIRCULATING SUPPLY</span>
+                        <span class="font-bold text-white text-sm">{{ coin.circulating_supply }}</span>
+                    </div>
+                </div>
+
+                <div class="space-y-2">
+                    <h4 class="font-display font-extrabold text-sm text-white">Deskripsi & Catatan Analisa</h4>
+                    <p class="text-xs text-slate-400 leading-relaxed font-sans">
+                        {{ coin.description }}
+                    </p>
+                </div>
+            </div>
+
+            <!-- Trade / Add to portfolio order execution glass card -->
+            <div class="p-6 bg-slate-950/40 border border-white/5 rounded-3xl space-y-6 backdrop-blur-xl relative overflow-hidden">
+                <div class="absolute inset-x-0 h-[1px] bg-gradient-to-r from-transparent via-cyan-400/30 to-transparent top-0"></div>
+                
+                <div>
+                    <span class="font-mono text-[9px] text-cyan-400 font-bold tracking-widest uppercase">TRANSACTION EXECUTION SERVICE</span>
+                    <h3 class="font-display text-lg font-bold text-white">Tambahkan ke Portofolioku</h3>
+                    <p class="text-xs text-slate-500 font-sans">Lakukan transaksi pembelian disini.</p>
+                </div>
+
+                <form method="POST" action="{% url 'add_to_portfolio' %}" class="grid grid-cols-1 md:grid-cols-3 gap-4 items-end font-mono text-[11px]">
+                    {% csrf_token %}
+                    <input type="hidden" name="coin_id" value="{{ coin.id }}">
+
+                    <div class="space-y-1.5 col-span-1">
+                        <label for="amount" class="text-slate-400 font-bold block uppercase">JUMLAH ({{ coin.symbol }})</label>
+                        <input id="amount" type="number" step="any" name="amount" min="0.00000001" placeholder="cth: 0.25" required class="w-full bg-slate-950 border border-white/10 rounded-xl px-4 py-3 text-xs text-white focus:outline-none focus:border-cyan-400 font-sans">
+                    </div>
+
+                    <div class="space-y-1.5 col-span-1">
+                        <label for="price" class="text-slate-400 font-bold block uppercase font-mono">HARGA BELI (USD)</label>
+                        <input id="price" type="number" step="any" name="price" value="{{ coin.price }}" required class="w-full bg-slate-950 border border-white/10 rounded-xl px-4 py-3 text-xs text-white focus:outline-none focus:border-cyan-400 font-sans">
+                    </div>
+
+                    <button type="submit" class="p-3 bg-cyan-400 hover:bg-cyan-300 text-black text-xs font-extrabold rounded-xl uppercase tracking-wider transition-all duration-150 cursor-pointer pt-3.5">
+                        ADD TRANSACTION
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Right 1 column: Related Market Analysis/Articles News Feed -->
+        <div class="space-y-6">
+            <h3 class="font-display font-extrabold text-sm text-white tracking-tight uppercase flex items-center gap-2">
+                <span class="w-2 h-2 rounded-full bg-cyan-400 animate-pulse"></span>
+                Berita Terkait
+            </h3>
+
+            {% for art in articles %}
+                <div class="p-5 bg-slate-950/20 border border-white/5 rounded-2xl relative space-y-3">
+                    <div class="flex items-center justify-between text-[10px] font-mono">
+                        <span class="px-2 py-0.5 rounded bg-white/5 text-slate-400 border border-white/5">{{ art.category }}</span>
+                        <span class="text-slate-600">{{ art.time_ago }}</span>
+                    </div>
+
+                    <h4 class="font-display text-xs font-extrabold text-white leading-tight hover:text-cyan-400 transition-colors pointer-events-none">
+                        {{ art.title }}
+                    </h4>
+
+                    <p class="text-[11px] text-slate-400 font-sans leading-relaxed">
+                        {{ art.content }}
+                    </p>
+                </div>
+            {% empty %}
+                <p class="text-xs font-mono text-slate-600 text-center py-6">Belum ada berita berkait.</p>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endblock %}

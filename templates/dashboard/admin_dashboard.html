@@ -1,0 +1,294 @@
+{% extends "base.html" %}
+
+{% block title %}Cryptexa | Administrator Control Center{% endblock %}
+
+{% block content %}
+<div class="max-w-6xl mx-auto px-6 py-6 space-y-8">
+    
+    <!-- Title banner with logout option -->
+    <div class="flex flex-wrap items-center justify-between gap-4 border-b border-white/5 pb-4">
+        <div class="space-y-1">
+            <span class="font-mono text-[9px] px-2.5 py-1 rounded bg-rose-500/10 text-rose-400 font-bold uppercase tracking-widest border border-rose-500/20 inline-block">
+                ROOT SECURITY DOMAIN
+            </span>
+            <h2 class="font-display text-2xl md:text-3xl font-black text-white tracking-tight">Superadmin Control Center</h2>
+            <p class="text-xs text-slate-400 font-sans">Mengelola database koin digital, mengaudit statistik sistem, dan memantau transaksi pengguna.</p>
+        </div>
+        
+        <a href="{% url 'admin_logout' %}" class="px-4 py-2 bg-rose-500/10 hover:bg-rose-500 text-rose-400 hover:text-white border border-rose-500/20 font-mono text-[10px] font-bold rounded-xl transition-all">
+            TERMINATE SESSION (LOGOUT)
+        </a>
+    </div>
+
+    <!-- Navigation Tabs -->
+    <div class="flex border-b border-white/5 font-mono text-[10px] gap-2 select-none">
+        <a href="{% url 'admin_dashboard' %}" class="px-5 py-2.5 bg-slate-900 text-cyan-400 border-t border-x border-white/10 rounded-t-xl font-bold flex items-center gap-1.5">
+            Overview &amp; Coin Registry
+        </a>
+        <a href="{% url 'admin_transactions' %}" class="px-5 py-2.5 hover:bg-slate-950/40 text-slate-400 hover:text-white transition-all font-bold flex items-center gap-1.5">
+            User Transactions Ledger
+        </a>
+    </div>
+
+    <!-- Stats Section Grid (4 cards) -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <!-- Stat 1: Total Coins -->
+        <div class="p-5 bg-slate-950/40 border border-white/5 rounded-2xl relative overflow-hidden backdrop-blur-xl flex flex-col justify-between h-28">
+            <div class="absolute -right-6 -bottom-6 w-16 h-16 rounded-full bg-cyan-400/5 blur-2xl pointer-events-none"></div>
+            <div class="relative z-10 space-y-1">
+                <span class="font-mono text-[8.5px] text-slate-500 tracking-wider uppercase block">Total Coins</span>
+                <div class="font-mono text-2xl font-black text-white">{{ total_coins }}</div>
+            </div>
+            <span class="text-[9px] text-slate-400 font-mono">Registered assets count</span>
+        </div>
+
+        <!-- Stat 2: Total Transactions -->
+        <div class="p-5 bg-slate-950/40 border border-white/5 rounded-2xl relative overflow-hidden backdrop-blur-xl flex flex-col justify-between h-28">
+            <div class="absolute -right-6 -bottom-6 w-16 h-16 rounded-full bg-purple-400/5 blur-2xl pointer-events-none"></div>
+            <div class="relative z-10 space-y-1">
+                <span class="font-mono text-[8.5px] text-slate-500 tracking-wider uppercase block">Total Transactions</span>
+                <div class="font-mono text-2xl font-black text-purple-400">{{ total_transactions }}</div>
+            </div>
+            <span class="text-[9px] text-slate-400 font-mono">Platform trade executions</span>
+        </div>
+
+        <!-- Stat 3: Total Portfolio Value -->
+        <div class="p-5 bg-slate-950/40 border border-white/5 rounded-2xl relative overflow-hidden backdrop-blur-xl flex flex-col justify-between h-28">
+            <div class="absolute -right-6 -bottom-6 w-16 h-16 rounded-full bg-emerald-400/5 blur-2xl pointer-events-none"></div>
+            <div class="relative z-10 space-y-1">
+                <span class="font-mono text-[8.5px] text-slate-500 tracking-wider uppercase block">Aggregate Net Worth</span>
+                <div class="font-mono text-xl font-black text-emerald-400">${{ total_portfolio_value|floatformat:2 }}</div>
+            </div>
+            <span class="text-[9px] text-slate-400 font-mono">Combined user databases</span>
+        </div>
+
+        <!-- Stat 4: Total Users -->
+        <div class="p-5 bg-slate-950/40 border border-white/5 rounded-2xl relative overflow-hidden backdrop-blur-xl flex flex-col justify-between h-28">
+            <div class="absolute -right-6 -bottom-6 w-16 h-16 rounded-full bg-blue-400/5 blur-2xl pointer-events-none"></div>
+            <div class="relative z-10 space-y-1">
+                <span class="font-mono text-[8.5px] text-slate-500 tracking-wider uppercase block">Total Registered Users</span>
+                <div class="font-mono text-2xl font-black text-blue-400">{{ total_users }}</div>
+            </div>
+            <span class="text-[9px] text-slate-400 font-mono">Database active profiles</span>
+        </div>
+    </div>
+
+    <!-- Mini chart analytics -->
+    <div class="p-6 bg-slate-950/40 border border-white/5 rounded-2xl backdrop-blur-xl flex flex-col justify-between h-[250px]">
+        <div>
+            <span class="text-[8px] font-mono text-cyan-400 uppercase tracking-widest font-bold">ANALYTICS SYSTEM MONITOR</span>
+            <h3 class="font-display font-medium text-white text-xs mt-1">Market Price Weights comparison (USD)</h3>
+        </div>
+        <div class="flex-grow flex items-center justify-center relative w-full h-[150px] mt-2">
+            <canvas id="adminMiniChart"></canvas>
+        </div>
+    </div>
+
+    <!-- Double Grid Layout -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        
+        <!-- Left: Current Active Coins Ledger (2/3 columns) -->
+        <div class="lg:col-span-2 space-y-4">
+            <h3 class="font-display font-extrabold text-sm text-white uppercase tracking-tight flex items-center gap-2">
+                <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping"></span>
+                Koin Terdaftar Aktif di SQLite
+            </h3>
+
+            <div class="p-1 bg-slate-950/30 border border-white/5 rounded-2xl overflow-hidden backdrop-blur-xl">
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left border-collapse text-xs">
+                        <thead>
+                            <tr class="border-b border-white/5 font-mono text-[9px] text-slate-500 font-bold uppercase select-none">
+                                <th class="p-4">Rank</th>
+                                <th class="p-4">Logo</th>
+                                <th class="p-4">Coin Name</th>
+                                <th class="p-4">Symbol</th>
+                                <th class="p-4 text-right">Price</th>
+                                <th class="p-4 text-right">Market Cap</th>
+                                <th class="p-4 text-center">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody class="font-sans">
+                            {% for coin in coins %}
+                                <tr class="border-b border-white/5 hover:bg-white/[0.01] transition-colors">
+                                    <td class="p-4 font-mono text-slate-500">#{{ coin.rank }}</td>
+                                    <td class="p-4">
+                                        <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-cyan-500/10 to-blue-500/10 border border-cyan-500/20 flex items-center justify-center font-bold text-cyan-400 font-mono text-xs select-none shadow-[0_0_12px_rgba(6,182,212,0.15)]">
+                                            {{ coin.symbol|slice:":1" }}
+                                        </div>
+                                    </td>
+                                    <td class="p-4 font-bold text-white">{{ coin.name }}</td>
+                                    <td class="p-4">
+                                        <span class="font-mono text-white font-bold bg-slate-900 border border-white/5 px-2 py-0.5 rounded text-[10px]">{{ coin.symbol }}</span>
+                                    </td>
+                                    <td class="p-4 text-right font-mono text-slate-300 font-semibold">${{ coin.price|floatformat:2 }}</td>
+                                    <td class="p-4 text-right font-mono text-slate-400">{{ coin.market_cap }}</td>
+                                    <td class="p-4 text-center">
+                                        <div class="flex items-center justify-center gap-1.5">
+                                            <a href="{% url 'edit_coin' coin.id %}" class="px-2.5 py-1.5 bg-[#06b6d4]/10 hover:bg-[#06b6d4] text-cyan-400 hover:text-black border border-[#06b6d4]/20 rounded-lg text-[9px] font-mono font-bold transition-all uppercase">
+                                                Edit
+                                            </a>
+                                            <a href="{% url 'delete_coin' coin.id %}" class="px-2.5 py-1.5 bg-rose-500/10 hover:bg-rose-500 text-rose-400 hover:text-white border border-rose-500/20 rounded-lg text-[9px] font-mono font-bold transition-all uppercase">
+                                                Delete
+                                            </a>
+                                        </div>
+                                    </td>
+                                </tr>
+                            {% empty %}
+                                 <tr>
+                                    <td colspan="7" class="p-8 text-center text-slate-500 font-mono text-[10px]">
+                                        Database kosong. Gunakan form di sebelah kanan untuk menambahkan koin baru!
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right side columns: Adding + Recent Activity -->
+        <div class="space-y-8">
+            <!-- Form Card -->
+            <div class="space-y-4">
+                <h3 class="font-display font-extrabold text-sm text-white uppercase tracking-tight">Daftarkan Koin Baru</h3>
+                
+                <div class="p-5 bg-slate-950/40 border border-white/5 rounded-2xl backdrop-blur-xl relative overflow-hidden">
+                    <form method="POST" action="{% url 'add_new_coin' %}" class="space-y-3.5 font-mono text-[9px] text-slate-400">
+                        {% csrf_token %}
+                        
+                        <div class="grid grid-cols-2 gap-3">
+                            <div class="space-y-1">
+                                <label for="name" class="font-bold">NAMA KOIN</label>
+                                <input id="name" type="text" name="name" placeholder="Solana" required class="w-full bg-slate-950 border border-white/10 rounded-xl px-3 py-2 text-[11px] text-white focus:outline-none focus:border-cyan-400 font-sans">
+                            </div>
+                            <div class="space-y-1">
+                                <label for="symbol" class="font-bold">SIMBOL KOIN</label>
+                                <input id="symbol" type="text" name="symbol" placeholder="SOL" required class="w-full bg-slate-950 border border-white/10 rounded-xl px-3 py-2 text-[11px] text-white focus:outline-none focus:border-cyan-400 font-sans">
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-2 gap-3">
+                            <div class="space-y-1">
+                                <label for="price" class="font-bold">HARGA (USD)</label>
+                                <input id="price" type="number" step="any" name="price" placeholder="145.22" required class="w-full bg-slate-950 border border-white/10 rounded-xl px-3 py-2 text-[11px] text-white focus:outline-none focus:border-cyan-400 font-sans">
+                            </div>
+                            <div class="space-y-1">
+                                <label for="change_24h" class="font-bold">PERUBAHAN 24H (%)</label>
+                                <input id="change_24h" type="number" step="any" name="change_24h" placeholder="5.24" required class="w-full bg-slate-950 border border-white/10 rounded-xl px-3 py-2 text-[11px] text-white focus:outline-none focus:border-cyan-400 font-sans">
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-2 gap-3">
+                            <div class="space-y-1">
+                                <label for="market_cap" class="font-bold">MARKET CAP</label>
+                                <input id="market_cap" type="text" name="market_cap" placeholder="$65.3 Billion" class="w-full bg-slate-950 border border-white/10 rounded-xl px-3 py-2 text-[11px] text-white focus:outline-none focus:border-cyan-400 font-sans">
+                            </div>
+                            <div class="space-y-1">
+                                <label for="volume_24h" class="font-bold">VOLUME 24H</label>
+                                <input id="volume_24h" type="text" name="volume_24h" placeholder="$3.8 Billion" class="w-full bg-slate-950 border border-white/10 rounded-xl px-3 py-2 text-[11px] text-white focus:outline-none focus:border-cyan-400 font-sans">
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-2 gap-3">
+                            <div class="space-y-1">
+                                <label for="circulating_supply" class="font-bold">CIRCULATING</label>
+                                <input id="circulating_supply" type="text" name="circulating_supply" placeholder="446.5M" class="w-full bg-slate-950 border border-white/10 rounded-xl px-3 py-2 text-[11px] text-white focus:outline-none focus:border-cyan-400 font-sans">
+                            </div>
+                            <div class="space-y-1">
+                                <label for="max_supply" class="font-bold">MAX SUPPLY</label>
+                                <input id="max_supply" type="text" name="max_supply" placeholder="Unlimited" class="w-full bg-slate-950 border border-white/10 rounded-xl px-3 py-2 text-[11px] text-white focus:outline-none focus:border-cyan-400 font-sans">
+                            </div>
+                        </div>
+
+                        <div class="space-y-1">
+                            <label for="rank" class="font-bold">GLOBAL RANK</label>
+                            <input id="rank" type="number" name="rank" placeholder="3" class="w-full bg-slate-950 border border-white/10 rounded-xl px-3 py-2 text-[11px] text-white focus:outline-none focus:border-cyan-400 font-sans">
+                        </div>
+
+                        <div class="space-y-1">
+                            <label for="description" class="font-bold">DESKRIPSI PARAMETER</label>
+                            <textarea id="description" name="description" placeholder="Ulasan teknologi koin..." rows="2" class="w-full bg-slate-950 border border-white/10 rounded-xl px-3 py-2 text-[11px] text-white focus:outline-none focus:border-cyan-400 font-sans leading-relaxed"></textarea>
+                        </div>
+
+                        <button type="submit" class="w-full py-2.5 bg-emerald-400 hover:bg-emerald-300 text-black text-xs font-extrabold rounded-xl uppercase tracking-wider transition-colors cursor-pointer">
+                            EXECUTE REGISTRATION
+                        </button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Recent activity section -->
+            <div class="space-y-4">
+                <h3 class="font-display font-extrabold text-sm text-white uppercase tracking-tight flex items-center gap-1.5">
+                    Recent Activity log
+                </h3>
+                
+                <div class="p-4 bg-slate-950/40 border border-white/5 rounded-2xl backdrop-blur-xl">
+                    <div class="space-y-3">
+                        {% for tx in recent_transactions %}
+                            <div class="flex items-center justify-between border-b border-white/5 pb-2 last:border-b-0 last:pb-0 text-[10px] font-mono select-none">
+                                <div class="space-y-0.5">
+                                    <div class="text-white font-bold text-[11px]">
+                                        user bought {{ tx.amount }} {{ tx.coin_symbol }}
+                                    </div>
+                                    <span class="text-slate-500 text-[8.5px] block">{{ tx.date_str }}</span>
+                                </div>
+                                <span class="text-emerald-400 font-bold">+${{ tx.price|floatformat:1 }}</span>
+                            </div>
+                        {% empty %}
+                            <div class="text-slate-500 text-center py-4 text-[9px] font-mono">
+                                No recent database transactions recorded.
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ChartJS Integration scripts -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        const rawChartData = JSON.parse('{{ admin_chart_json|escapejs }}');
+        const labels = rawChartData.labels || [];
+        const prices = rawChartData.prices || [];
+
+        const adminMiniCtx = document.getElementById('adminMiniChart').getContext('2d');
+        if (labels.length === 0) {
+            adminMiniCtx.fillStyle = '#64748b';
+            adminMiniCtx.font = '11px ui-monospace, monospace';
+            adminMiniCtx.textAlign = 'center';
+            adminMiniCtx.fillText("Belum ada data koin terdaftar.", 150, 75);
+        } else {
+            new Chart(adminMiniCtx, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Price (USD)',
+                        data: prices,
+                        backgroundColor: 'rgba(34, 211, 238, 0.5)',
+                        borderColor: '#22d3ee',
+                        borderWidth: 1.5,
+                        borderRadius: 4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        x: { grid: { color: 'rgba(255, 255, 255, 0.02)' }, ticks: { color: '#64748b', font: { family: 'ui-monospace, monospace', size: 9 } } },
+                        y: { grid: { color: 'rgba(255, 255, 255, 0.02)' }, ticks: { color: '#64748b', font: { family: 'ui-monospace, monospace', size: 9 } } }
+                    },
+                    plugins: {
+                        legend: { display: false }
+                    }
+                }
+            });
+        }
+    });
+</script>
+{% endblock %}

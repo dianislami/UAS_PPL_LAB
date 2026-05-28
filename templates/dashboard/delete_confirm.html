@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+
+{% block title %}Cryptexa | Konfirmasi Hapus Koin {{ coin.name }}{% endblock %}
+
+{% block content %}
+<div class="max-w-md mx-auto px-6 py-12">
+    
+    <!-- Confirmation Card -->
+    <div class="p-6 bg-slate-950/40 border border-rose-500/20 rounded-3xl backdrop-blur-xl relative overflow-hidden space-y-6">
+        <div class="absolute -right-12 -top-12 w-28 h-28 rounded-full bg-rose-500/5 blur-3xl pointer-events-none"></div>
+        
+        <div class="text-center space-y-2">
+            <span class="font-mono text-[9px] px-3 py-1 rounded bg-rose-500/10 text-rose-400 font-bold uppercase tracking-widest border border-rose-500/20 inline-block">
+                WARNING: DESTRUCTIVE ACTION
+            </span>
+            <div class="w-16 h-16 rounded-2xl bg-rose-500/10 border border-rose-500/20 flex items-center justify-center mx-auto text-rose-400 font-mono text-2xl font-black mb-4 select-none animate-pulse">
+                !
+            </div>
+            <h2 class="font-display text-lg font-black text-white tracking-tight">Hapus Koin Selamanya?</h2>
+            <p class="text-xs text-slate-400 font-sans">
+                Anda meminta untuk menghapus <span class="text-white font-bold">{{ coin.name }} ({{ coin.symbol }})</span> dari database Cryptexa.
+            </p>
+        </div>
+
+        <!-- Warning details -->
+        <div class="p-4 bg-rose-500/5 border border-rose-500/15 rounded-xl text-left text-[11px] text-rose-300 font-sans leading-relaxed space-y-1">
+            <h4 class="font-bold text-xs text-white uppercase font-mono">DAMPAK CASCADE DATABASE:</h4>
+            <p>&bull; Koin ini akan lenyap dari seluruh list eksplorasi pasar koin.</p>
+            <p>&bull; Portofolio holdings yang dimiliki oleh semua pengguna (termasuk admin) untuk koin ini akan otomatis dihapus permanen.</p>
+            <p>&bull; Tindakan ini tidak dapat dibatalkan.</p>
+        </div>
+
+        <form method="POST" action="{% url 'delete_coin' coin.id %}" class="space-y-3 font-mono text-[10px]">
+            {% csrf_token %}
+            
+            <button type="submit" class="w-full py-3 bg-rose-500 hover:bg-rose-400 text-white text-xs font-black rounded-xl uppercase tracking-wider transition-all cursor-pointer">
+                I UNDERSTAND, EXECUTE DELETION
+            </button>
+            
+            <a href="{% url 'admin_dashboard' %}" class="block w-full py-3 bg-slate-900 hover:bg-white/10 text-slate-300 hover:text-white border border-white/5 text-center text-xs font-bold rounded-xl transition-all">
+                CANCEL ACTION
+            </a>
+        </form>
+    </div>
+</div>
+{% endblock %}

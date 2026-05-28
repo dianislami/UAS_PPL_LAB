@@ -1,0 +1,100 @@
+{% extends "base.html" %}
+
+{% block title %}Cryptexa | Explore Market koin{% endblock %}
+
+{% block content %}
+<div class="max-w-6xl mx-auto px-6 py-6 space-y-8">
+    <div class="space-y-2">
+        <span class="font-mono text-[9px] px-2.5 py-1 rounded bg-[#06b6d4]/10 text-cyan-400 font-bold uppercase tracking-widest border border-cyan-400/20 inline-block">
+            FINANCIAL INTELLIGENCE CENTER
+        </span>
+        <h2 class="font-display text-2xl md:text-3xl font-black text-white tracking-tight">Eksplorasi Pasar Koin</h2>
+        <p class="text-xs text-slate-400 max-w-lg font-sans">
+            Gunakan kotak pencarian di bawah untuk memfilter aset finansial global secara instan.
+        </p>
+    </div>
+
+    <!-- Live filter search bar -->
+    <div class="flex items-center gap-3 bg-slate-950/40 border border-white/5 rounded-2xl px-4 py-2.5 max-w-md">
+        <svg class="h-4 w-4 text-slate-500 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
+        <input type="text" id="coin-search-input" onkeyup="filterCoinsTable()" placeholder="Cari nama koin atau simbol (cth: BTC)..." class="w-full bg-transparent text-xs text-white focus:outline-none placeholder-slate-600">
+    </div>
+
+    <!-- Table Grid -->
+    <div class="p-1 bg-slate-950/30 border border-white/5 rounded-3xl overflow-hidden backdrop-blur-xl">
+        <div class="overflow-x-auto">
+            <table class="w-full text-left border-collapse">
+                <thead>
+                    <tr class="border-b border-white/5 font-mono text-[10px] text-slate-500 font-bold uppercase select-none">
+                        <th class="p-5">Rank</th>
+                        <th class="p-5">Aset</th>
+                        <th class="p-5 text-right">Harga Live</th>
+                        <th class="p-5 text-right">Perubahan 24 Jam</th>
+                        <th class="p-5 text-right">Kapitalisasi Pasar</th>
+                        <th class="p-5 text-right">Opsi</th>
+                    </tr>
+                </thead>
+                <tbody id="coins-table-body" class="font-sans text-xs">
+                    {% for coin in coins %}
+                        <tr class="coin-row border-b border-white/5 hover:bg-white/[0.02] transition-colors" data-name="{{ coin.name|lower }}" data-symbol="{{ coin.symbol|lower }}">
+                            <td class="p-5 font-mono text-slate-500">#{{ coin.rank }}</td>
+                            <td class="p-5">
+                                <div class="flex items-center gap-3">
+                                    <div class="w-9 h-9 rounded-xl bg-gradient-to-br from-cyan-500/10 to-blue-500/10 border border-cyan-500/20 flex items-center justify-center font-bold text-cyan-400 font-mono text-xs select-none shadow-[0_0_12px_rgba(6,182,212,0.15)]">
+                                        {{ coin.symbol }}
+                                    </div>
+                                    <div>
+                                        <h4 class="font-extrabold text-white text-sm leading-none">{{ coin.name }}</h4>
+                                        <span class="font-mono text-[9px] text-slate-500 tracking-wider">{{ coin.symbol }}</span>
+                                    </div>
+                                </div>
+                            </td>
+                            <td class="p-5 text-right font-mono text-white font-semibold">
+                                ${{ coin.price|floatformat:2 }}
+                            </td>
+                            <td class="p-5 text-right font-mono">
+                                <span class="px-2 py-1 rounded border text-[10px] uppercase font-bold {% if coin.change_24h > 0 %}border-emerald-500/10 bg-emerald-500/5 text-emerald-400{% else %}border-red-500/10 bg-red-500/5 text-red-400{% endif %}">
+                                    {{ coin.change_24h }}%
+                                </span>
+                            </td>
+                            <td class="p-5 text-right font-mono text-slate-400">
+                                {{ coin.market_cap }}
+                            </td>
+                            <td class="p-5 text-right">
+                                <a href="{% url 'coin_detail' coin.id %}" class="px-3.5 py-1.5 bg-slate-900 hover:bg-cyan-400 hover:text-black border border-white/10 hover:border-transparent rounded-lg text-[10px] font-mono font-bold uppercase transition-all">
+                                    Analyze
+                                </a>
+                            </td>
+                        </tr>
+                    {% empty %}
+                        <tr>
+                            <td colspan="6" class="p-10 text-center text-slate-500 font-mono">
+                                Belum ada koin digital yang terdaftar di sistem.
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<script>
+    function filterCoinsTable() {
+        const input = document.getElementById('coin-search-input');
+        const query = input.value.toLowerCase().trim();
+        const rows = document.querySelectorAll('.coin-row');
+        
+        rows.forEach(row => {
+            const name = row.getAttribute('data-name');
+            const symbol = row.getAttribute('data-symbol');
+            
+            if (name.includes(query) || symbol.includes(query)) {
+                row.classList.remove('hidden');
+            } else {
+                row.classList.add('hidden');
+            }
+        });
+    }
+</script>
+{% endblock %}
