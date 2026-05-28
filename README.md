@@ -1,18 +1,18 @@
-# 🪙 CRYPTEXA — Secure Ledger Node & Cryptocurrency Portfolio Platform
+# 🪙 CRYPTEXA - Cryptocurrency Portfolio Platform
 
-CRYPTEXA adalah platform modern pemantau portofolio cryptocurrency futuristik (*Secure Ledger Node*) yang dirancang dengan antarmuka bertema dark-cyberpunk yang elegan dan responsif. Pengguna dapat melacak harga koin cryptocurrency terupdate secara real-time, mencatat riwayat transaksi beli (BUY) secara instan ke dalam database, melihat analisis performa portofolio lanjutan, serta mengelola koin yang tersedia langsung melalui Dashboard Admin khusus.
+CRYPTEXA adalah platform modern pemantau portofolio cryptocurrency futuristik yang dirancang dengan antarmuka bertema dark-cyberpunk yang elegan dan responsif. Pengguna dapat melacak harga koin cryptocurrency terupdate secara real-time, mencatat riwayat transaksi beli (BUY) secara instan ke dalam database, melihat analisis performa portofolio lanjutan, serta mengelola koin yang tersedia langsung melalui Dashboard Admin khusus.
 
-Aplikasi ini menggunakan kombinasi arsitektur **Django (Python)** sebagai core backend engine-nya dan antarmuka dengan sentuhan **Tailwind CSS** modern untuk memastikan performa yang cepat, aman, dan memanjakan mata.
+Aplikasi ini menggunakan kombinasi arsitektur **Django (Python)** sebagai core backend engine-nya dan antarmuka dengan sentuhan **Tailwind CSS** modern untuk memastikan performa yang cepat, aman, dan modern.
 
 ---
 
-## 🚀 Fitur Utama
+## Fitur Utama
 
 1. **Futuristic Cryptography Trackers**  
    Tampilan daftar koin cryptocurrency dengan informasi peringkat, simbol koin, harga langsung, serta persentase perubahan harga yang dinamis dan terstandarisasi.
    
 2. **Instant & Secure Transaction Database-Sync**  
-   Setiap transaksi beli (BUY) yang dilakukan oleh pengguna langsung tersinkronisasi dan disimpan secara permanen ke dalam database SQLite (secara otomatis terasosiasi dengan user ledger utama kita), mengeleminasi hilangnya data sesi di server.
+   Setiap transaksi beli (BUY) yang dilakukan oleh pengguna langsung tersinkronisasi dan disimpan secara permanen ke dalam database SQLite, mengeleminasi hilangnya data sesi di server.
 
 3. **Advanced Portfolio Intelligence & Metrics**  
    Dashboard portofolio investor lengkap dengan metrik kalkulasi tingkat profesional, meliputi:
@@ -29,7 +29,7 @@ Aplikasi ini menggunakan kombinasi arsitektur **Django (Python)** sebagai core b
 
 ---
 
-## 🛠️ Teknologi & Arsitektur yang Digunakan
+## Teknologi & Arsitektur yang Digunakan
 
 Aplikasi ini dirancang dengan struktur monolitik modern yang kokoh dan mudah deployable:
 
@@ -37,11 +37,10 @@ Aplikasi ini dirancang dengan struktur monolitik modern yang kokoh dan mudah dep
 * **Database**: **SQLite** (menggunakan Django ORM relasional untuk mencatat relasi koin, transaksi, akun portofolio, dan user)  
 * **UI & Styling**: **Tailwind CSS v4** dengan penyesuaian custom themes elegan (*Futuristic Slate Grays*, *Luminous Cyan Glows*, *Clean Typography*)  
 * **Interactive Charts**: Responsive interactive chart rendering bawaan.
-* **Server Wrapper (Opsional)**: Node.js Express Reverse Proxy (`server.ts`) yang membungkus server Django di container demi mempermudah port-forwarding eksternal.
 
 ---
 
-## 📂 Struktur Folder Aplikasi
+## Struktur Folder Aplikasi
 
 Berikut adalah gambaran arsitektur folder utama Cryptexa:
 
@@ -57,22 +56,14 @@ Berikut adalah gambaran arsitektur folder utama Cryptexa:
 │   ├── portfolio/         # Template dashboard kalkulasi portofolio
 │   └── dashboard/         # Template form manajemen admin & edit koin
 ├── cryptexa/              # Konfigurasi sistem Django induk (settings.py, urls.py, wsgi.py)
-├── server.ts              # Express.js Proxy Wrapper Node & auto-run migration script
-├── package.json           # Konfigurasi dependency Node.js jika menggunakan proxy wrapper
 ├── db.sqlite3             # Database lokal SQLite tempat semua transaksi & koin tersimpan
 ├── manage.py              # Entry-point standard Django command-line utility
-└── README.md              # File panduan informasi dan setup aplikasi (Dokumen ini)
+└── README.md              # File panduan informasi dan setup aplikasi
 ```
 
 ---
 
-## 🏁 Panduan Cara Menjalankan Aplikasi di Komputer Lokal
-
-Ada **dua cara praktis** yang dapat Anda pilih untuk menjalankan proyek ini dari awal:
-
-### 💡 Pilihan 1: Menjalankan Langsung dengan Django & Python (Sangat Direkomendasikan)
-
-Metode ini adalah metode bawaan standar Django yang sangat cepat dan tidak memerlukan Node.js terinstal.
+## Panduan Cara Menjalankan Aplikasi di Komputer Lokal
 
 #### Langkah 1: Clone Repository
 Buka terminal dan lakukan clone proyek:
@@ -81,7 +72,7 @@ git clone <URL_REPOSITORY_GITHUB_ANDA>
 cd cryptexa
 ```
 
-#### Langkah 2: Buat & Aktifkan Virtual Environment
+#### Langkah 2: Buat & Aktifkan Virtual Environment **(Opsional)**
 * Untuk **macOS/Linux**:
   ```bash
   python3 -m venv venv
@@ -110,37 +101,13 @@ python manage.py migrate
 python manage.py runserver
 ```
 Buka browser favorit Anda dan akses alamat:
-👉 **[http://127.0.0.1:8000/](http://127.0.0.1:8000/)**
+**[http://127.0.0.1:8000/](http://127.0.0.1:8000/)**
 
 ---
 
-### 🌐 Pilihan 2: Menjalankan Menggunakan Node.js Wrapper (Otomatis & Terbimbing)
-
-Spesial untuk environment modern yang membutuhkan runtime berbasis Node.js untuk port forward otomatis. Wrapper `server.ts` akan secara otomatis melakukan instalisasi `pip django`, melakukan migrasi, dan memulai server di port `3000`.
-
-#### Langkah 1: Clone & Masuk Direktori
-```bash
-git clone <URL_REPOSITORY_GITHUB_ANDA>
-cd cryptexa
-```
-
-#### Langkah 2: Pastikan Node.js Terinstal & Install Dependensi Node
-```bash
-npm install
-```
-
-#### Langkah 3: Jalankan Command Dev
-```bash
-npm run dev
-```
-Express.js akan menginisiasi perintah database python secara otomatis. Setelah selesai, akses server Anda di:
-👉 **[http://localhost:3000/](http://localhost:3000/)**
-
----
-
-## 🔑 Pengaturan Default Akun Admin
+## Pengaturan Default Akun Admin
 Jika Anda ingin masuk ke admin panel (/dashboard/) untuk mendemokan edit data koin secara lokal melalui Django Admin atau custom Dashboard Admin:
-* Akun superuser default akan otomatis dibuat oleh sistem jika modul `server.ts` mendeteksi tidak ada user:
+* Akun superuser default akan otomatis dibuat oleh sistem jika sistem mendeteksi tidak ada user:
   * **Username**: `admin`
   * **Password**: `admin123`
 
@@ -151,4 +118,4 @@ python manage.py createsuperuser
 
 ---
 
-*Selamat menggunakan **CRYPTEXA**! Kelola dan kalkulasikan portofolio aset kripto Anda secara aman dan tanpa hambatan dengan performa real-time.* 🚀
+*Selamat menggunakan **CRYPTEXA**! Kelola dan kalkulasikan portofolio aset kripto Anda secara aman dan tanpa hambatan dengan performa real-time.*
